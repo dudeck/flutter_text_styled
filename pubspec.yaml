@@ -1,6 +1,6 @@
 name: flutter_text_styled
 description: Flutter package to get styled Text with basic HTML text tags.
-version: 0.0.2
+version: 0.1.0
 homepage: https://github.com/dudeck/flutter_text_styled
 
 environment:
