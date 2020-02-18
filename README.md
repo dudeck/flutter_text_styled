@@ -2,40 +2,15 @@
 
 A Flutter helper class to add tag-styled text into your widgets.
 
-## Getting Started
+## Features
 
-In current version only **[b] [/b]** tags are allowed for bold text style.
+- [X] [b][/b] **bold text**
+- [X] [i][/i] *italics text*
+- [X] [u][/u] __underline text__
+- [ ] Colored text
+- [ ] Hyperlinks
 
-Example of usage:
-```dart
-class StyledPage extends StatefulWidget {
-  @override
-  _StyledPageState createState() => _StyledPageState();
-}
-
-class _StyledPageState extends State<StyledPage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: WidgetUtils.createAppBarWithBack(
-        context: context,
-        title: AppLocalizations.of(context).menuHelp,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: TextStyled()
-                .getStyledTextWidgets("Your normal text with [b]bolded text inside[/b] "
-                "\n and again normal and again [b]bold text[/b]."),
-          ),
-        ),
-      ),
-    );
-  }
-}
-```
+In current version **[b][/b], [i][/i], [u][/u]** tags are allowed for bold, italic and underline text style.
 
 `getStyledTextWidgets` returns `List<Text>` widgets.
 

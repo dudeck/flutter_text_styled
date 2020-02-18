@@ -16,11 +16,9 @@ class _StyledPageState extends State<StyledPage> {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Wrap(
             children: TextStyled().getStyledTextWidgets(
-                "Your normal text with [b]bolded text inside[/b] "
-                "\n and again normal and again [b]bold text[/b]."),
+                "This is normal text with [b]bold text[/b] [i]italic text[/i] [u]underlined text[/u] and [b][i][u]mixed styled[/b][/i][/u]"),
           ),
         ),
       ),
