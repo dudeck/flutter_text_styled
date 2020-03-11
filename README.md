@@ -7,12 +7,61 @@ A Flutter helper class to add tag-styled text into your widgets.
 - [X] [b][/b] **bold text**
 - [X] [i][/i] *italics text*
 - [X] [u][/u] __underline text__
-- [ ] Colored text
+- [X] [color=NAME_OF_COLOR_OR_VALUE] [/color] Colored text
 - [ ] Hyperlinks
+- [ ] Text size
 
-In current version **[b][/b], [i][/i], [u][/u]** tags are allowed for bold, italic and underline text style.
+In current version **[b][/b], [i][/i], [u][/u], [color=NAME_OF_COLOR_OR_VALUE] [/color]** tags are allowed for bold, italic, underline and colored text style.
 
 `getStyledTextWidgets` returns `List<Text>` widgets.
+
+Color could be defined as name from `colors.dart` from `material` package or using int to parse by this class. See example.
+
+List of supported colors:
+-  "amber":
+-  "amberAccent"
+-  "black"
+-  "black12"
+-  "black26"
+-  "black38"
+-  "black45"
+-  "black54"
+-  "black87"
+-  "blue"
+-  "blueAccent"
+-  "blueGrey"
+-  "brown"
+-  "cyan"
+-  "cyanAccent"
+-  "deepOrangeAccent"
+-  "deepPurple"
+-  "deepPurpleAccent"
+-  "green"
+-  "greenAccent";
+-  "grey"
+-  "indigo"
+-  "indigoAccent"
+-  "lightBlue"
+-  "lightBlueAccent"
+-  "lightGreen"
+-  "lightGreenAccent"
+-  "lime"
+-  "limeAccent"
+-  "orange"
+-  "orangeAccent"
+-  "pink"
+-  "pinkAccent"
+-  "purple"
+-  "purpleAccent"
+-  "pink"
+-  "red"
+-  "redAccent"
+-  "teal"
+-  "tealAccent"
+-  "transparent"
+-  "white"
+-  "yellow"
+-  "yellowAccent"
 
 ## Questions or Feedback?
 
