@@ -1,3 +1,5 @@
+## [0.3.0] - 10.11.2020
+* Added functionality **[a=LINK] [/a]** tags
 ## [0.2.0] - 11.03.2020
 * Added functionality **[color=NAME_OF_COLOR_OR_VALUE] [/color]** tags
 ## [0.1.0] - 18.02.2020

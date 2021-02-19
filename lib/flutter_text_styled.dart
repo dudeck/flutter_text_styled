@@ -5,13 +5,15 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-enum TAGS { BOLD, ITALIC, UNDERLINE, COLOR }
+enum TAGS { BOLD, ITALIC, UNDERLINE, COLOR, LINK }
 
-RegExp _anyTagRegExp =
-    RegExp(r'\[[\/]{0,1}[b|i|u]\]|(\[color[\=]{0,1}.+?\])|\[\/color\]');
-RegExp _openTagRegExp = RegExp(r'\[[b|i|u]\]|(\[color[\=]{0,1}.+?\])');
-RegExp _closeTagRegExp = RegExp(r'\[\/[b|i|u]\]|(\[\/color\])');
+RegExp _anyTagRegExp = RegExp(
+    r'\[[\/]{0,1}[b|i|u]\]|(\[color[\=]{0,1}.+?\])|\[\/color\]|(\[a[\=]{0,1}.+?\])|\[\/a\]');
+RegExp _openTagRegExp =
+    RegExp(r'\[[b|i|u]\]|(\[color[\=]{0,1}.+?\])|(\[a[\=]{0,1}.+?\])');
+RegExp _closeTagRegExp = RegExp(r'\[\/[b|i|u]\]|(\[\/color\])|(\[\/a\])');
 
 class TextStyled {
   String _remainingText;
@@ -34,10 +36,13 @@ class TextStyled {
   static const COLOR_START_TAG = '[color=';
   static const COLOR_END_TAG = '[/color]';
 
+  static const HYPERLINK_START_TAG = '[a=';
+  static const HYPERLINK_END_TAG = '[/a]';
+
   static const REPLACEMENT_EMPTY_TAG = "";
 
-  List<Text> getStyledTextWidgets(String text) {
-    List<Text> resultWidgets = List();
+  List<Widget> getStyledTextWidgets(String text) {
+    List<Widget> resultWidgets = List();
     _remainingText = text;
     while (_remainingText != null && _remainingText.isNotEmpty) {
       int openTagIndex = _remainingText.indexOf(_openTagRegExp);
@@ -51,7 +56,7 @@ class TextStyled {
   }
 
   void _handleNextTag(
-      int openTagIndex, int closeTagIndex, List<Text> resultWidgets) {
+      int openTagIndex, int closeTagIndex, List<Widget> resultWidgets) {
     if (openTagIndex == -1 && closeTagIndex == -1) {
       _normalText = _remainingText;
       _addNormalTextWidget(resultWidgets);
@@ -82,6 +87,8 @@ class TextStyled {
       _styledTextTags.remove(TAGS.UNDERLINE);
     } else if (_remainingText.indexOf(COLOR_END_TAG) == tagIndex) {
       _styledTextTags.remove(TAGS.COLOR);
+    } else if (_remainingText.indexOf(HYPERLINK_END_TAG) == tagIndex) {
+      _styledTextTags.remove(TAGS.LINK);
     }
   }
 
@@ -97,6 +104,11 @@ class TextStyled {
       final color =
           _remainingText.substring(tagIndex + 7, indexOfCloseColorTag);
       _styledTextTags.putIfAbsent(TAGS.COLOR, () => color);
+    } else if (_remainingText.indexOf(HYPERLINK_START_TAG) == tagIndex) {
+      final int indexOfCloseHyperlinkTag = _remainingText.indexOf("]");
+      final link =
+          _remainingText.substring(tagIndex + 3, indexOfCloseHyperlinkTag);
+      _styledTextTags.putIfAbsent(TAGS.LINK, () => link);
     }
 
     if (tagIndex < 0) {
@@ -127,7 +139,7 @@ class TextStyled {
   }
 
   void _findEndStyledTextIndex(
-      List<Text> resultWidgets, int openTagIndex, int closeTagIndex) {
+      List<Widget> resultWidgets, int openTagIndex, int closeTagIndex) {
     int openTagIndex = _remainingText.indexOf(_openTagRegExp);
     int closeTagIndex = _remainingText.indexOf(_closeTagRegExp);
 
@@ -146,7 +158,7 @@ class TextStyled {
     }
   }
 
-  void _generateTextWidgets(List<Text> resultWidgets) {
+  void _generateTextWidgets(List<Widget> resultWidgets) {
     _styledText = _remainingText.substring(0, _endStyledTextIndex);
     _remainingText =
         _remainingText.substring(_endStyledTextIndex, _remainingText.length);
@@ -156,16 +168,16 @@ class TextStyled {
     _addStyledTextWidget(resultWidgets);
   }
 
-  void _addNormalTextWidget(List<Text> resultWidgets) {
+  void _addNormalTextWidget(List<Widget> resultWidgets) {
     if (_normalText != null && _normalText.isNotEmpty) {
       resultWidgets.add(Text(_normalText));
       _normalText = null;
     }
   }
 
-  void _addStyledTextWidget(List<Text> resultWidgets) {
+  void _addStyledTextWidget(List<Widget> resultWidgets) {
     if (_styledText != null && _styledText.isNotEmpty) {
-      resultWidgets.add(Text(_styledText, style: _generateTextStyle()));
+      resultWidgets.add(_generateTextStyledWidgets());
       _styledText = null;
     }
   }
@@ -175,8 +187,9 @@ class TextStyled {
     _normalText.replaceAll(_anyTagRegExp, REPLACEMENT_EMPTY_TAG);
   }
 
-  TextStyle _generateTextStyle() {
+  Widget _generateTextStyledWidgets() {
     TextStyle style = TextStyle();
+    String link = '';
     _styledTextTags.forEach((tag, value) {
       switch (tag) {
         case TAGS.BOLD:
@@ -190,9 +203,24 @@ class TextStyled {
           break;
         case TAGS.COLOR:
           style = _getColorStyle(value, style);
+          break;
+        case TAGS.LINK:
+          style = style.copyWith(
+              decoration: TextDecoration.underline, color: Colors.blue);
+          link = value;
+          break;
       }
     });
-    return style;
+    final textWidget = Text(_styledText, style: style);
+    if (link.isNotEmpty) {
+      final gestureDetector = GestureDetector(
+          child: textWidget,
+          onTap: () {
+            launch(link);
+          });
+      return gestureDetector;
+    }
+    return textWidget;
   }
 
   TextStyle _getColorStyle(String value, TextStyle style) {
