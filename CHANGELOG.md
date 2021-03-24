@@ -1,3 +1,5 @@
+## [0.4.0] - 24.03.2021
+* Added NullSafety and updated dependencies
 ## [0.3.0] - 10.11.2020
 * Added functionality **[a=LINK] [/a]** tags
 ## [0.2.0] - 11.03.2020

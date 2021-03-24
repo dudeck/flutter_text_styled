@@ -16,11 +16,11 @@ RegExp _openTagRegExp =
 RegExp _closeTagRegExp = RegExp(r'\[\/[b|i|u]\]|(\[\/color\])|(\[\/a\])');
 
 class TextStyled {
-  String _remainingText;
-  int _startStyledTextIndex;
-  String _normalText;
-  int _endStyledTextIndex;
-  String _styledText;
+  String? _remainingText;
+  int? _startStyledTextIndex;
+  String? _normalText;
+  int? _endStyledTextIndex;
+  String? _styledText;
 
   LinkedHashMap<TAGS, String> _styledTextTags = LinkedHashMap<TAGS, String>();
 
@@ -42,11 +42,11 @@ class TextStyled {
   static const REPLACEMENT_EMPTY_TAG = "";
 
   List<Widget> getStyledTextWidgets(String text) {
-    List<Widget> resultWidgets = List();
+    List<Widget> resultWidgets = [];
     _remainingText = text;
-    while (_remainingText != null && _remainingText.isNotEmpty) {
-      int openTagIndex = _remainingText.indexOf(_openTagRegExp);
-      int closeTagIndex = _remainingText.indexOf(_closeTagRegExp);
+    while (_remainingText != null && _remainingText!.isNotEmpty) {
+      int openTagIndex = _remainingText!.indexOf(_openTagRegExp);
+      int closeTagIndex = _remainingText!.indexOf(_closeTagRegExp);
 
       _handleTagOnFirstIndex(openTagIndex, closeTagIndex);
 
@@ -70,49 +70,49 @@ class TextStyled {
   void _handleTagOnFirstIndex(int openTagIndex, int closeTagIndex) {
     if (openTagIndex == 0) {
       _addStyledTag(openTagIndex);
-      _remainingText.replaceFirst(_openTagRegExp, REPLACEMENT_EMPTY_TAG);
+      _remainingText!.replaceFirst(_openTagRegExp, REPLACEMENT_EMPTY_TAG);
     }
     if (closeTagIndex == 0) {
       _removeStyledTag(closeTagIndex);
-      _remainingText.replaceFirst(_closeTagRegExp, REPLACEMENT_EMPTY_TAG);
+      _remainingText!.replaceFirst(_closeTagRegExp, REPLACEMENT_EMPTY_TAG);
     }
   }
 
   void _removeStyledTag(int tagIndex) {
-    if (_remainingText.indexOf(BOLD_END_TAG) == tagIndex) {
+    if (_remainingText!.indexOf(BOLD_END_TAG) == tagIndex) {
       _styledTextTags.remove(TAGS.BOLD);
-    } else if (_remainingText.indexOf(ITALIC_END_TAG) == tagIndex) {
+    } else if (_remainingText!.indexOf(ITALIC_END_TAG) == tagIndex) {
       _styledTextTags.remove(TAGS.ITALIC);
-    } else if (_remainingText.indexOf(UNDERLINE_END_TAG) == tagIndex) {
+    } else if (_remainingText!.indexOf(UNDERLINE_END_TAG) == tagIndex) {
       _styledTextTags.remove(TAGS.UNDERLINE);
-    } else if (_remainingText.indexOf(COLOR_END_TAG) == tagIndex) {
+    } else if (_remainingText!.indexOf(COLOR_END_TAG) == tagIndex) {
       _styledTextTags.remove(TAGS.COLOR);
-    } else if (_remainingText.indexOf(HYPERLINK_END_TAG) == tagIndex) {
+    } else if (_remainingText!.indexOf(HYPERLINK_END_TAG) == tagIndex) {
       _styledTextTags.remove(TAGS.LINK);
     }
   }
 
   void _addStyledTag(int tagIndex) {
-    if (_remainingText.indexOf(BOLD_START_TAG) == tagIndex) {
+    if (_remainingText!.indexOf(BOLD_START_TAG) == tagIndex) {
       _styledTextTags.putIfAbsent(TAGS.BOLD, () => "");
-    } else if (_remainingText.indexOf(ITALIC_START_TAG) == tagIndex) {
+    } else if (_remainingText!.indexOf(ITALIC_START_TAG) == tagIndex) {
       _styledTextTags.putIfAbsent(TAGS.ITALIC, () => "");
-    } else if (_remainingText.indexOf(UNDERLINE_START_TAG) == tagIndex) {
+    } else if (_remainingText!.indexOf(UNDERLINE_START_TAG) == tagIndex) {
       _styledTextTags.putIfAbsent(TAGS.UNDERLINE, () => "");
-    } else if (_remainingText.indexOf(COLOR_START_TAG) == tagIndex) {
-      final int indexOfCloseColorTag = _remainingText.indexOf("]");
+    } else if (_remainingText!.indexOf(COLOR_START_TAG) == tagIndex) {
+      final int indexOfCloseColorTag = _remainingText!.indexOf("]");
       final color =
-          _remainingText.substring(tagIndex + 7, indexOfCloseColorTag);
+          _remainingText!.substring(tagIndex + 7, indexOfCloseColorTag);
       _styledTextTags.putIfAbsent(TAGS.COLOR, () => color);
-    } else if (_remainingText.indexOf(HYPERLINK_START_TAG) == tagIndex) {
-      final int indexOfCloseHyperlinkTag = _remainingText.indexOf("]");
+    } else if (_remainingText!.indexOf(HYPERLINK_START_TAG) == tagIndex) {
+      final int indexOfCloseHyperlinkTag = _remainingText!.indexOf("]");
       final link =
-          _remainingText.substring(tagIndex + 3, indexOfCloseHyperlinkTag);
+          _remainingText!.substring(tagIndex + 3, indexOfCloseHyperlinkTag);
       _styledTextTags.putIfAbsent(TAGS.LINK, () => link);
     }
 
     if (tagIndex < 0) {
-      _startStyledTextIndex = _remainingText.length;
+      _startStyledTextIndex = _remainingText!.length;
     }
   }
 
@@ -131,17 +131,17 @@ class TextStyled {
       }
     }
 
-    _normalText = _remainingText.substring(0, _startStyledTextIndex);
+    _normalText = _remainingText!.substring(0, _startStyledTextIndex);
     _remainingText =
-        _remainingText.substring(_startStyledTextIndex, _remainingText.length);
+        _remainingText!.substring(_startStyledTextIndex!, _remainingText!.length);
     _remainingText =
-        _remainingText.replaceFirst(_anyTagRegExp, REPLACEMENT_EMPTY_TAG);
+        _remainingText!.replaceFirst(_anyTagRegExp, REPLACEMENT_EMPTY_TAG);
   }
 
   void _findEndStyledTextIndex(
       List<Widget> resultWidgets, int openTagIndex, int closeTagIndex) {
-    int openTagIndex = _remainingText.indexOf(_openTagRegExp);
-    int closeTagIndex = _remainingText.indexOf(_closeTagRegExp);
+    int openTagIndex = _remainingText!.indexOf(_openTagRegExp);
+    int closeTagIndex = _remainingText!.indexOf(_closeTagRegExp);
 
     if (openTagIndex < closeTagIndex && openTagIndex != -1) {
       if (openTagIndex != -1) {
@@ -159,32 +159,32 @@ class TextStyled {
   }
 
   void _generateTextWidgets(List<Widget> resultWidgets) {
-    _styledText = _remainingText.substring(0, _endStyledTextIndex);
+    _styledText = _remainingText!.substring(0, _endStyledTextIndex);
     _remainingText =
-        _remainingText.substring(_endStyledTextIndex, _remainingText.length);
-    _remainingText.replaceFirst(_anyTagRegExp, REPLACEMENT_EMPTY_TAG);
+        _remainingText!.substring(_endStyledTextIndex!, _remainingText!.length);
+    _remainingText!.replaceFirst(_anyTagRegExp, REPLACEMENT_EMPTY_TAG);
     _clearTagsFromText();
     _addNormalTextWidget(resultWidgets);
     _addStyledTextWidget(resultWidgets);
   }
 
   void _addNormalTextWidget(List<Widget> resultWidgets) {
-    if (_normalText != null && _normalText.isNotEmpty) {
-      resultWidgets.add(Text(_normalText));
+    if (_normalText != null && _normalText!.isNotEmpty) {
+      resultWidgets.add(Text(_normalText!));
       _normalText = null;
     }
   }
 
   void _addStyledTextWidget(List<Widget> resultWidgets) {
-    if (_styledText != null && _styledText.isNotEmpty) {
+    if (_styledText != null && _styledText!.isNotEmpty) {
       resultWidgets.add(_generateTextStyledWidgets());
       _styledText = null;
     }
   }
 
   void _clearTagsFromText() {
-    _styledText.replaceAll(_anyTagRegExp, REPLACEMENT_EMPTY_TAG);
-    _normalText.replaceAll(_anyTagRegExp, REPLACEMENT_EMPTY_TAG);
+    _styledText!.replaceAll(_anyTagRegExp, REPLACEMENT_EMPTY_TAG);
+    _normalText!.replaceAll(_anyTagRegExp, REPLACEMENT_EMPTY_TAG);
   }
 
   Widget _generateTextStyledWidgets() {
@@ -211,7 +211,7 @@ class TextStyled {
           break;
       }
     });
-    final textWidget = Text(_styledText, style: style);
+    final textWidget = Text(_styledText!, style: style);
     if (link.isNotEmpty) {
       final gestureDetector = GestureDetector(
           child: textWidget,
