@@ -174,7 +174,11 @@ class TextStyled {
 
   void _addNormalTextWidget(List<Widget> resultWidgets) {
     if (_normalText != null && _normalText!.isNotEmpty) {
-      resultWidgets.add(Text(_normalText!, style: textStyle));
+      resultWidgets.add(Text(
+        _normalText!,
+        style: textStyle,
+        softWrap: true,
+      ));
       _normalText = null;
     }
   }
@@ -215,7 +219,11 @@ class TextStyled {
           break;
       }
     });
-    final textWidget = Text(_styledText!, style: style);
+    final textWidget = Text(
+      _styledText!,
+      style: style,
+      softWrap: true,
+    );
     if (link.isNotEmpty) {
       final gestureDetector = GestureDetector(
           child: textWidget,
