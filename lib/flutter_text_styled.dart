@@ -2,6 +2,7 @@ library flutter_text_styled;
 
 import 'dart:collection';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -47,33 +48,51 @@ class TextStyled {
     this.textStyle = const TextStyle(),
   });
 
-  List<Widget> getStyledTextWidgets(String text) {
-    List<Widget> resultWidgets = [];
+  RichText getRichText(String text) {
+    List<TextSpan> resultTextSpans = [];
     _remainingText = text;
     while (_remainingText != null && _remainingText!.isNotEmpty) {
       int openTagIndex = _remainingText!.indexOf(_openTagRegExp);
       int closeTagIndex = _remainingText!.indexOf(_closeTagRegExp);
 
-      _handleTagOnFirstIndex(openTagIndex, closeTagIndex);
+      _handleTagOnFirstIndex(
+        openTagIndex,
+        closeTagIndex,
+      );
 
-      _handleNextTag(openTagIndex, closeTagIndex, resultWidgets);
+      _handleNextTag(
+        openTagIndex,
+        closeTagIndex,
+        resultTextSpans,
+      );
     }
-    return resultWidgets;
+    return RichText(
+      text: TextSpan(
+        style: textStyle,
+        children: resultTextSpans,
+      ),
+    );
   }
 
   void _handleNextTag(
-      int openTagIndex, int closeTagIndex, List<Widget> resultWidgets) {
+    int openTagIndex,
+    int closeTagIndex,
+    List<TextSpan> resultTextSpans,
+  ) {
     if (openTagIndex == -1 && closeTagIndex == -1) {
       _normalText = _remainingText;
-      _addNormalTextWidget(resultWidgets);
+      _addNormalTextWidget(resultTextSpans);
       _remainingText = null;
     } else {
       _findStartStyledTextIndex(openTagIndex, closeTagIndex);
-      _findEndStyledTextIndex(resultWidgets, openTagIndex, closeTagIndex);
+      _findEndStyledTextIndex(resultTextSpans, openTagIndex, closeTagIndex);
     }
   }
 
-  void _handleTagOnFirstIndex(int openTagIndex, int closeTagIndex) {
+  void _handleTagOnFirstIndex(
+    int openTagIndex,
+    int closeTagIndex,
+  ) {
     if (openTagIndex == 0) {
       _addStyledTag(openTagIndex);
       _remainingText!.replaceFirst(_openTagRegExp, REPLACEMENT_EMPTY_TAG);
@@ -122,7 +141,10 @@ class TextStyled {
     }
   }
 
-  void _findStartStyledTextIndex(int openTagIndex, int closeTagIndex) {
+  void _findStartStyledTextIndex(
+    int openTagIndex,
+    int closeTagIndex,
+  ) {
     if (openTagIndex < closeTagIndex && openTagIndex != -1) {
       if (openTagIndex != -1) {
         _startStyledTextIndex = openTagIndex;
@@ -145,50 +167,52 @@ class TextStyled {
   }
 
   void _findEndStyledTextIndex(
-      List<Widget> resultWidgets, int openTagIndex, int closeTagIndex) {
+    List<TextSpan> resultTextSpans,
+    int openTagIndex,
+    int closeTagIndex,
+  ) {
     int openTagIndex = _remainingText!.indexOf(_openTagRegExp);
     int closeTagIndex = _remainingText!.indexOf(_closeTagRegExp);
 
     if (openTagIndex < closeTagIndex && openTagIndex != -1) {
       if (openTagIndex != -1) {
         _endStyledTextIndex = openTagIndex;
-        _generateTextWidgets(resultWidgets);
+        _generateTextWidgets(resultTextSpans);
         _addStyledTag(openTagIndex);
       }
     } else {
       if (closeTagIndex != -1) {
         _endStyledTextIndex = closeTagIndex;
-        _generateTextWidgets(resultWidgets);
+        _generateTextWidgets(resultTextSpans);
         _removeStyledTag(closeTagIndex);
       }
     }
   }
 
-  void _generateTextWidgets(List<Widget> resultWidgets) {
+  void _generateTextWidgets(List<TextSpan> resultTextSpans) {
     _styledText = _remainingText!.substring(0, _endStyledTextIndex);
     _remainingText =
         _remainingText!.substring(_endStyledTextIndex!, _remainingText!.length);
     _remainingText!.replaceFirst(_anyTagRegExp, REPLACEMENT_EMPTY_TAG);
     _clearTagsFromText();
-    _addNormalTextWidget(resultWidgets);
-    _addStyledTextWidget(resultWidgets);
+    _addNormalTextWidget(resultTextSpans);
+    _addStyledTextWidget(resultTextSpans);
   }
 
-  void _addNormalTextWidget(List<Widget> resultWidgets) {
+  void _addNormalTextWidget(List<TextSpan> resultTextSpans) {
     if (_normalText != null && _normalText!.isNotEmpty) {
-      resultWidgets.add(
-        Text(
-          _normalText!,
-          style: textStyle,
+      resultTextSpans.add(
+        TextSpan(
+          text: _normalText!,
         ),
       );
       _normalText = null;
     }
   }
 
-  void _addStyledTextWidget(List<Widget> resultWidgets) {
+  void _addStyledTextWidget(List<TextSpan> resultTextSpans) {
     if (_styledText != null && _styledText!.isNotEmpty) {
-      resultWidgets.add(_generateTextStyledWidgets());
+      resultTextSpans.add(_generateTextStyledWidgets());
       _styledText = null;
     }
   }
@@ -198,7 +222,7 @@ class TextStyled {
     _normalText!.replaceAll(_anyTagRegExp, REPLACEMENT_EMPTY_TAG);
   }
 
-  Widget _generateTextStyledWidgets() {
+  TextSpan _generateTextStyledWidgets() {
     TextStyle style = textStyle;
     String link = '';
     _styledTextTags.forEach((tag, value) {
@@ -222,19 +246,19 @@ class TextStyled {
           break;
       }
     });
-    final textWidget = Text(_styledText!, style: style);
-    if (link.isNotEmpty) {
-      final gestureDetector = GestureDetector(
-          child: textWidget,
-          onTap: () {
-            launch(link);
-          });
-      return gestureDetector;
-    }
-    return textWidget;
+    return TextSpan(
+      text: _styledText!,
+      style: style,
+      recognizer: link.isEmpty
+          ? null
+          : (TapGestureRecognizer()..onTap = () => launch(link)),
+    );
   }
 
-  TextStyle _getColorStyle(String value, TextStyle style) {
+  TextStyle _getColorStyle(
+    String value,
+    TextStyle style,
+  ) {
     switch (value) {
       case "amber":
         style = style.copyWith(color: Colors.amber);
@@ -369,7 +393,11 @@ class TextStyled {
         style = style.copyWith(color: Colors.yellowAccent);
         break;
       default:
-        style = style.copyWith(color: Color(int.parse(value)));
+        style = style.copyWith(
+          color: Color(
+            int.parse(value),
+          ),
+        );
     }
     return style;
   }

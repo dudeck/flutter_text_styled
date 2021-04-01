@@ -1,3 +1,5 @@
+## [0.5.1] - 01.04.2021
+* Transforms List<Wiget> to RichText
 ## [0.5.0] - 01.04.2021
 * Added Style property
 ## [0.4.0] - 24.03.2021
