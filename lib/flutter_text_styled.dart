@@ -5,7 +5,6 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 enum TAGS { BOLD, ITALIC, UNDERLINE, COLOR, LINK }
 
@@ -45,8 +44,8 @@ class TextStyled {
 
   TextStyled({this.textStyle = const TextStyle()});
 
-  List<Widget> getStyledTextWidgets(String text) {
-    List<Widget> resultWidgets = [];
+  RichText getRichText(String text) {
+    List<TextSpan> resultWidgets = [];
     _remainingText = text;
     while (_remainingText != null && _remainingText!.isNotEmpty) {
       int openTagIndex = _remainingText!.indexOf(_openTagRegExp);
@@ -56,11 +55,11 @@ class TextStyled {
 
       _handleNextTag(openTagIndex, closeTagIndex, resultWidgets);
     }
-    return resultWidgets;
+    return RichText(text: TextSpan(style: textStyle, children: resultWidgets));
   }
 
   void _handleNextTag(
-      int openTagIndex, int closeTagIndex, List<Widget> resultWidgets) {
+      int openTagIndex, int closeTagIndex, List<TextSpan> resultWidgets) {
     if (openTagIndex == -1 && closeTagIndex == -1) {
       _normalText = _remainingText;
       _addNormalTextWidget(resultWidgets);
@@ -143,7 +142,7 @@ class TextStyled {
   }
 
   void _findEndStyledTextIndex(
-      List<Widget> resultWidgets, int openTagIndex, int closeTagIndex) {
+      List<TextSpan> resultWidgets, int openTagIndex, int closeTagIndex) {
     int openTagIndex = _remainingText!.indexOf(_openTagRegExp);
     int closeTagIndex = _remainingText!.indexOf(_closeTagRegExp);
 
@@ -162,7 +161,7 @@ class TextStyled {
     }
   }
 
-  void _generateTextWidgets(List<Widget> resultWidgets) {
+  void _generateTextWidgets(List<TextSpan> resultWidgets) {
     _styledText = _remainingText!.substring(0, _endStyledTextIndex);
     _remainingText =
         _remainingText!.substring(_endStyledTextIndex!, _remainingText!.length);
@@ -172,18 +171,16 @@ class TextStyled {
     _addStyledTextWidget(resultWidgets);
   }
 
-  void _addNormalTextWidget(List<Widget> resultWidgets) {
+  void _addNormalTextWidget(List<TextSpan> resultWidgets) {
     if (_normalText != null && _normalText!.isNotEmpty) {
-      resultWidgets.add(Text(
-        _normalText!,
-        style: textStyle,
-        softWrap: true,
+      resultWidgets.add(TextSpan(
+        text: _normalText!,
       ));
       _normalText = null;
     }
   }
 
-  void _addStyledTextWidget(List<Widget> resultWidgets) {
+  void _addStyledTextWidget(List<TextSpan> resultWidgets) {
     if (_styledText != null && _styledText!.isNotEmpty) {
       resultWidgets.add(_generateTextStyledWidgets());
       _styledText = null;
@@ -195,7 +192,7 @@ class TextStyled {
     _normalText!.replaceAll(_anyTagRegExp, REPLACEMENT_EMPTY_TAG);
   }
 
-  Widget _generateTextStyledWidgets() {
+  TextSpan _generateTextStyledWidgets() {
     TextStyle style = textStyle;
     String link = '';
     _styledTextTags.forEach((tag, value) {
@@ -219,20 +216,10 @@ class TextStyled {
           break;
       }
     });
-    final textWidget = Text(
-      _styledText!,
+    return TextSpan(
+      text: _styledText!,
       style: style,
-      softWrap: true,
     );
-    if (link.isNotEmpty) {
-      final gestureDetector = GestureDetector(
-          child: textWidget,
-          onTap: () {
-            launch(link);
-          });
-      return gestureDetector;
-    }
-    return textWidget;
   }
 
   TextStyle _getColorStyle(String value, TextStyle style) {
