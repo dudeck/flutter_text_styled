@@ -16,6 +16,8 @@ RegExp _openTagRegExp =
 RegExp _closeTagRegExp = RegExp(r'\[\/[b|i|u]\]|(\[\/color\])|(\[\/a\])');
 
 class TextStyled {
+  final TextStyle textStyle;
+
   String? _remainingText;
   int? _startStyledTextIndex;
   String? _normalText;
@@ -40,6 +42,8 @@ class TextStyled {
   static const HYPERLINK_END_TAG = '[/a]';
 
   static const REPLACEMENT_EMPTY_TAG = "";
+
+  TextStyled({this.textStyle = const TextStyle()});
 
   List<Widget> getStyledTextWidgets(String text) {
     List<Widget> resultWidgets = [];
@@ -132,8 +136,8 @@ class TextStyled {
     }
 
     _normalText = _remainingText!.substring(0, _startStyledTextIndex);
-    _remainingText =
-        _remainingText!.substring(_startStyledTextIndex!, _remainingText!.length);
+    _remainingText = _remainingText!
+        .substring(_startStyledTextIndex!, _remainingText!.length);
     _remainingText =
         _remainingText!.replaceFirst(_anyTagRegExp, REPLACEMENT_EMPTY_TAG);
   }
@@ -170,7 +174,7 @@ class TextStyled {
 
   void _addNormalTextWidget(List<Widget> resultWidgets) {
     if (_normalText != null && _normalText!.isNotEmpty) {
-      resultWidgets.add(Text(_normalText!));
+      resultWidgets.add(Text(_normalText!, style: textStyle));
       _normalText = null;
     }
   }
@@ -188,7 +192,7 @@ class TextStyled {
   }
 
   Widget _generateTextStyledWidgets() {
-    TextStyle style = TextStyle();
+    TextStyle style = textStyle;
     String link = '';
     _styledTextTags.forEach((tag, value) {
       switch (tag) {
