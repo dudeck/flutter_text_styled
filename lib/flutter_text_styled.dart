@@ -2,9 +2,11 @@ library flutter_text_styled;
 
 import 'dart:collection';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 enum TAGS { BOLD, ITALIC, UNDERLINE, COLOR, LINK }
 
@@ -45,7 +47,7 @@ class TextStyled {
   TextStyled({this.textStyle = const TextStyle()});
 
   RichText getRichText(String text) {
-    List<TextSpan> resultWidgets = [];
+    List<TextSpan> resultTextSpans = [];
     _remainingText = text;
     while (_remainingText != null && _remainingText!.isNotEmpty) {
       int openTagIndex = _remainingText!.indexOf(_openTagRegExp);
@@ -53,20 +55,21 @@ class TextStyled {
 
       _handleTagOnFirstIndex(openTagIndex, closeTagIndex);
 
-      _handleNextTag(openTagIndex, closeTagIndex, resultWidgets);
+      _handleNextTag(openTagIndex, closeTagIndex, resultTextSpans);
     }
-    return RichText(text: TextSpan(style: textStyle, children: resultWidgets));
+    return RichText(
+        text: TextSpan(style: textStyle, children: resultTextSpans));
   }
 
   void _handleNextTag(
-      int openTagIndex, int closeTagIndex, List<TextSpan> resultWidgets) {
+      int openTagIndex, int closeTagIndex, List<TextSpan> resultTextSpans) {
     if (openTagIndex == -1 && closeTagIndex == -1) {
       _normalText = _remainingText;
-      _addNormalTextWidget(resultWidgets);
+      _addNormalTextWidget(resultTextSpans);
       _remainingText = null;
     } else {
       _findStartStyledTextIndex(openTagIndex, closeTagIndex);
-      _findEndStyledTextIndex(resultWidgets, openTagIndex, closeTagIndex);
+      _findEndStyledTextIndex(resultTextSpans, openTagIndex, closeTagIndex);
     }
   }
 
@@ -142,47 +145,47 @@ class TextStyled {
   }
 
   void _findEndStyledTextIndex(
-      List<TextSpan> resultWidgets, int openTagIndex, int closeTagIndex) {
+      List<TextSpan> resultTextSpans, int openTagIndex, int closeTagIndex) {
     int openTagIndex = _remainingText!.indexOf(_openTagRegExp);
     int closeTagIndex = _remainingText!.indexOf(_closeTagRegExp);
 
     if (openTagIndex < closeTagIndex && openTagIndex != -1) {
       if (openTagIndex != -1) {
         _endStyledTextIndex = openTagIndex;
-        _generateTextWidgets(resultWidgets);
+        _generateTextWidgets(resultTextSpans);
         _addStyledTag(openTagIndex);
       }
     } else {
       if (closeTagIndex != -1) {
         _endStyledTextIndex = closeTagIndex;
-        _generateTextWidgets(resultWidgets);
+        _generateTextWidgets(resultTextSpans);
         _removeStyledTag(closeTagIndex);
       }
     }
   }
 
-  void _generateTextWidgets(List<TextSpan> resultWidgets) {
+  void _generateTextWidgets(List<TextSpan> resultTextSpans) {
     _styledText = _remainingText!.substring(0, _endStyledTextIndex);
     _remainingText =
         _remainingText!.substring(_endStyledTextIndex!, _remainingText!.length);
     _remainingText!.replaceFirst(_anyTagRegExp, REPLACEMENT_EMPTY_TAG);
     _clearTagsFromText();
-    _addNormalTextWidget(resultWidgets);
-    _addStyledTextWidget(resultWidgets);
+    _addNormalTextWidget(resultTextSpans);
+    _addStyledTextWidget(resultTextSpans);
   }
 
-  void _addNormalTextWidget(List<TextSpan> resultWidgets) {
+  void _addNormalTextWidget(List<TextSpan> resultTextSpans) {
     if (_normalText != null && _normalText!.isNotEmpty) {
-      resultWidgets.add(TextSpan(
+      resultTextSpans.add(TextSpan(
         text: _normalText!,
       ));
       _normalText = null;
     }
   }
 
-  void _addStyledTextWidget(List<TextSpan> resultWidgets) {
+  void _addStyledTextWidget(List<TextSpan> resultTextSpans) {
     if (_styledText != null && _styledText!.isNotEmpty) {
-      resultWidgets.add(_generateTextStyledWidgets());
+      resultTextSpans.add(_generateTextStyledWidgets());
       _styledText = null;
     }
   }
@@ -217,9 +220,11 @@ class TextStyled {
       }
     });
     return TextSpan(
-      text: _styledText!,
-      style: style,
-    );
+        text: _styledText!,
+        style: style,
+        recognizer: link.isEmpty
+            ? null
+            : (TapGestureRecognizer()..onTap = () => launch(link)));
   }
 
   TextStyle _getColorStyle(String value, TextStyle style) {
