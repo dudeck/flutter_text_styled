@@ -23,8 +23,12 @@ class _StyledPageState extends State<StyledPage> {
           padding: const EdgeInsets.all(8.0),
           child: SingleChildScrollView(
             child: Wrap(
-              children: TextStyled().getStyledTextWidgets(
-                  "This is normal text [color=blue]blue text[/color] with [b]bold text[/b] [i]italic text[/i] [u]underlined text[/u] and [color=0xFFFFD600][b][i][u]mixed styled[/b][/i][/u][/color] and [a=https://pub.dev/packages/flutter_text_styled] link to open pub.dev[/a]"),
+              children: TextStyled(
+                textStyle: TextStyle(
+                  color: Colors.grey,
+                ),
+              ).getStyledTextWidgets(
+                  "This is normal grey by style text [color=blue]blue text[/color] with [b]bold text[/b] [i]italic text[/i] [u]underlined text[/u] and [color=0xFFFFD600][b][i][u]mixed styled[/b][/i][/u][/color] and [a=https://pub.dev/packages/flutter_text_styled] link to open pub.dev[/a]"),
             ),
           ),
         ),

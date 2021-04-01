@@ -1,3 +1,5 @@
+## [0.5.0] - 01.04.2021
+* Added Style property
 ## [0.4.0] - 24.03.2021
 * Added NullSafety and updated dependencies
 ## [0.3.0] - 10.11.2020

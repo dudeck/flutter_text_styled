@@ -9,6 +9,7 @@ A Flutter helper class to add tag-styled text into your widgets.
 - [X] [u][/u] __underline text__
 - [X] [color=NAME_OF_COLOR_OR_VALUE] [/color] Colored text
 - [X] Hyperlinks
+- [X] Styles
 - [ ] Text size
 
 In current version **[b][/b], [i][/i], [u][/u], [color=NAME_OF_COLOR_OR_VALUE] [/color] [a=LINK][/a]** tags are allowed for bold, italic, underline colored text style and hyperlinks.

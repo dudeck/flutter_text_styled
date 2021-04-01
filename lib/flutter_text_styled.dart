@@ -43,7 +43,9 @@ class TextStyled {
 
   static const REPLACEMENT_EMPTY_TAG = "";
 
-  TextStyled({this.textStyle = const TextStyle()});
+  TextStyled({
+    this.textStyle = const TextStyle(),
+  });
 
   List<Widget> getStyledTextWidgets(String text) {
     List<Widget> resultWidgets = [];
@@ -174,7 +176,12 @@ class TextStyled {
 
   void _addNormalTextWidget(List<Widget> resultWidgets) {
     if (_normalText != null && _normalText!.isNotEmpty) {
-      resultWidgets.add(Text(_normalText!, style: textStyle));
+      resultWidgets.add(
+        Text(
+          _normalText!,
+          style: textStyle,
+        ),
+      );
       _normalText = null;
     }
   }
