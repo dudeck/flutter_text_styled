@@ -18,6 +18,10 @@ RegExp _closeTagRegExp = RegExp(r'\[\/[b|i|u]\]|(\[\/color\])|(\[\/a\])');
 
 class TextStyled {
   final TextStyle textStyle;
+  final TextAlign textAlign;
+  final int? maxLines;
+  final bool softWrap;
+  final TextOverflow overflow;
 
   String? _remainingText;
   int? _startStyledTextIndex;
@@ -46,6 +50,10 @@ class TextStyled {
 
   TextStyled({
     this.textStyle = const TextStyle(),
+    this.textAlign = TextAlign.start,
+    this.softWrap = true,
+    this.overflow = TextOverflow.clip,
+    this.maxLines,
   });
 
   RichText getRichText(String text) {
@@ -67,6 +75,10 @@ class TextStyled {
       );
     }
     return RichText(
+      textAlign: textAlign,
+      maxLines: maxLines,
+      softWrap: softWrap,
+      overflow: overflow,
       text: TextSpan(
         style: textStyle,
         children: resultTextSpans,
