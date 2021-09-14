@@ -1,3 +1,5 @@
+## [0.5.2] - 14.09.2021
+* Adding params textAlign, maxLines, softWrap, textOverflow to RichText
 ## [0.5.1] - 01.04.2021
 * Transforms List<Wiget> to RichText
 ## [0.5.0] - 01.04.2021
