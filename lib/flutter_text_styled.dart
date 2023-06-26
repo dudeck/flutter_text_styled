@@ -4,17 +4,15 @@ import 'dart:collection';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-enum TAGS { BOLD, ITALIC, UNDERLINE, COLOR, LINK }
+enum TAGS { bold, italic, underline, color, link }
 
 RegExp _anyTagRegExp = RegExp(
-    r'\[[\/]{0,1}[b|i|u]\]|(\[color[\=]{0,1}.+?\])|\[\/color\]|(\[a[\=]{0,1}.+?\])|\[\/a\]');
+    r'\[[/]{0,1}[b|i|u]\]|(\[color[=]{0,1}.+?\])|\[/color\]|(\[a[=]{0,1}.+?\])|\[/a\]');
 RegExp _openTagRegExp =
-    RegExp(r'\[[b|i|u]\]|(\[color[\=]{0,1}.+?\])|(\[a[\=]{0,1}.+?\])');
-RegExp _closeTagRegExp = RegExp(r'\[\/[b|i|u]\]|(\[\/color\])|(\[\/a\])');
+    RegExp(r'\[[b|i|u]\]|(\[color[=]{0,1}.+?\])|(\[a[=]{0,1}.+?\])');
+RegExp _closeTagRegExp = RegExp(r'\[/[b|i|u]\]|(\[/color\])|(\[/a\])');
 
 class TextStyled {
   final TextStyle textStyle;
@@ -29,24 +27,24 @@ class TextStyled {
   int? _endStyledTextIndex;
   String? _styledText;
 
-  LinkedHashMap<TAGS, String> _styledTextTags = LinkedHashMap<TAGS, String>();
+  final LinkedHashMap<TAGS, String> _styledTextTags = LinkedHashMap<TAGS, String>();
 
-  static const BOLD_START_TAG = '[b]';
-  static const BOLD_END_TAG = '[/b]';
+  static const boldStartTag = '[b]';
+  static const boldEndTag = '[/b]';
 
-  static const ITALIC_START_TAG = '[i]';
-  static const ITALIC_END_TAG = '[/i]';
+  static const italicStartTag = '[i]';
+  static const italicEndTag = '[/i]';
 
-  static const UNDERLINE_START_TAG = '[u]';
-  static const UNDERLINE_END_TAG = '[/u]';
+  static const underlineStartTag = '[u]';
+  static const underlineEndTag = '[/u]';
 
-  static const COLOR_START_TAG = '[color=';
-  static const COLOR_END_TAG = '[/color]';
+  static const colorStartTag = '[color=';
+  static const colorEndTag = '[/color]';
 
-  static const HYPERLINK_START_TAG = '[a=';
-  static const HYPERLINK_END_TAG = '[/a]';
+  static const hyperlinkStartTag = '[a=';
+  static const hyperlinkEndTag = '[/a]';
 
-  static const REPLACEMENT_EMPTY_TAG = "";
+  static const replacementEmptyTag = "";
 
   TextStyled({
     this.textStyle = const TextStyle(),
@@ -107,45 +105,45 @@ class TextStyled {
   ) {
     if (openTagIndex == 0) {
       _addStyledTag(openTagIndex);
-      _remainingText!.replaceFirst(_openTagRegExp, REPLACEMENT_EMPTY_TAG);
+      _remainingText!.replaceFirst(_openTagRegExp, replacementEmptyTag);
     }
     if (closeTagIndex == 0) {
       _removeStyledTag(closeTagIndex);
-      _remainingText!.replaceFirst(_closeTagRegExp, REPLACEMENT_EMPTY_TAG);
+      _remainingText!.replaceFirst(_closeTagRegExp, replacementEmptyTag);
     }
   }
 
   void _removeStyledTag(int tagIndex) {
-    if (_remainingText!.indexOf(BOLD_END_TAG) == tagIndex) {
-      _styledTextTags.remove(TAGS.BOLD);
-    } else if (_remainingText!.indexOf(ITALIC_END_TAG) == tagIndex) {
-      _styledTextTags.remove(TAGS.ITALIC);
-    } else if (_remainingText!.indexOf(UNDERLINE_END_TAG) == tagIndex) {
-      _styledTextTags.remove(TAGS.UNDERLINE);
-    } else if (_remainingText!.indexOf(COLOR_END_TAG) == tagIndex) {
-      _styledTextTags.remove(TAGS.COLOR);
-    } else if (_remainingText!.indexOf(HYPERLINK_END_TAG) == tagIndex) {
-      _styledTextTags.remove(TAGS.LINK);
+    if (_remainingText!.indexOf(boldEndTag) == tagIndex) {
+      _styledTextTags.remove(TAGS.bold);
+    } else if (_remainingText!.indexOf(italicEndTag) == tagIndex) {
+      _styledTextTags.remove(TAGS.italic);
+    } else if (_remainingText!.indexOf(underlineEndTag) == tagIndex) {
+      _styledTextTags.remove(TAGS.underline);
+    } else if (_remainingText!.indexOf(colorEndTag) == tagIndex) {
+      _styledTextTags.remove(TAGS.color);
+    } else if (_remainingText!.indexOf(hyperlinkEndTag) == tagIndex) {
+      _styledTextTags.remove(TAGS.link);
     }
   }
 
   void _addStyledTag(int tagIndex) {
-    if (_remainingText!.indexOf(BOLD_START_TAG) == tagIndex) {
-      _styledTextTags.putIfAbsent(TAGS.BOLD, () => "");
-    } else if (_remainingText!.indexOf(ITALIC_START_TAG) == tagIndex) {
-      _styledTextTags.putIfAbsent(TAGS.ITALIC, () => "");
-    } else if (_remainingText!.indexOf(UNDERLINE_START_TAG) == tagIndex) {
-      _styledTextTags.putIfAbsent(TAGS.UNDERLINE, () => "");
-    } else if (_remainingText!.indexOf(COLOR_START_TAG) == tagIndex) {
+    if (_remainingText!.indexOf(boldStartTag) == tagIndex) {
+      _styledTextTags.putIfAbsent(TAGS.bold, () => "");
+    } else if (_remainingText!.indexOf(italicStartTag) == tagIndex) {
+      _styledTextTags.putIfAbsent(TAGS.italic, () => "");
+    } else if (_remainingText!.indexOf(underlineStartTag) == tagIndex) {
+      _styledTextTags.putIfAbsent(TAGS.underline, () => "");
+    } else if (_remainingText!.indexOf(colorStartTag) == tagIndex) {
       final int indexOfCloseColorTag = _remainingText!.indexOf("]");
       final color =
           _remainingText!.substring(tagIndex + 7, indexOfCloseColorTag);
-      _styledTextTags.putIfAbsent(TAGS.COLOR, () => color);
-    } else if (_remainingText!.indexOf(HYPERLINK_START_TAG) == tagIndex) {
+      _styledTextTags.putIfAbsent(TAGS.color, () => color);
+    } else if (_remainingText!.indexOf(hyperlinkStartTag) == tagIndex) {
       final int indexOfCloseHyperlinkTag = _remainingText!.indexOf("]");
       final link =
           _remainingText!.substring(tagIndex + 3, indexOfCloseHyperlinkTag);
-      _styledTextTags.putIfAbsent(TAGS.LINK, () => link);
+      _styledTextTags.putIfAbsent(TAGS.link, () => link);
     }
 
     if (tagIndex < 0) {
@@ -175,7 +173,7 @@ class TextStyled {
     _remainingText = _remainingText!
         .substring(_startStyledTextIndex!, _remainingText!.length);
     _remainingText =
-        _remainingText!.replaceFirst(_anyTagRegExp, REPLACEMENT_EMPTY_TAG);
+        _remainingText!.replaceFirst(_anyTagRegExp, replacementEmptyTag);
   }
 
   void _findEndStyledTextIndex(
@@ -205,7 +203,7 @@ class TextStyled {
     _styledText = _remainingText!.substring(0, _endStyledTextIndex);
     _remainingText =
         _remainingText!.substring(_endStyledTextIndex!, _remainingText!.length);
-    _remainingText!.replaceFirst(_anyTagRegExp, REPLACEMENT_EMPTY_TAG);
+    _remainingText!.replaceFirst(_anyTagRegExp, replacementEmptyTag);
     _clearTagsFromText();
     _addNormalTextWidget(resultTextSpans);
     _addStyledTextWidget(resultTextSpans);
@@ -230,8 +228,8 @@ class TextStyled {
   }
 
   void _clearTagsFromText() {
-    _styledText!.replaceAll(_anyTagRegExp, REPLACEMENT_EMPTY_TAG);
-    _normalText!.replaceAll(_anyTagRegExp, REPLACEMENT_EMPTY_TAG);
+    _styledText!.replaceAll(_anyTagRegExp, replacementEmptyTag);
+    _normalText!.replaceAll(_anyTagRegExp, replacementEmptyTag);
   }
 
   TextSpan _generateTextStyledWidgets() {
@@ -239,19 +237,19 @@ class TextStyled {
     String link = '';
     _styledTextTags.forEach((tag, value) {
       switch (tag) {
-        case TAGS.BOLD:
+        case TAGS.bold:
           style = style.copyWith(fontWeight: FontWeight.bold);
           break;
-        case TAGS.ITALIC:
+        case TAGS.italic:
           style = style.copyWith(fontStyle: FontStyle.italic);
           break;
-        case TAGS.UNDERLINE:
+        case TAGS.underline:
           style = style.copyWith(decoration: TextDecoration.underline);
           break;
-        case TAGS.COLOR:
+        case TAGS.color:
           style = _getColorStyle(value, style);
           break;
-        case TAGS.LINK:
+        case TAGS.link:
           style = style.copyWith(
               decoration: TextDecoration.underline, color: Colors.blue);
           link = value;
@@ -263,7 +261,10 @@ class TextStyled {
       style: style,
       recognizer: link.isEmpty
           ? null
-          : (TapGestureRecognizer()..onTap = () => launch(link)),
+          : (TapGestureRecognizer()
+            ..onTap = () => launchUrl(
+                  Uri(path: link),
+                )),
     );
   }
 
@@ -376,9 +377,6 @@ class TextStyled {
         break;
       case "purpleAccent":
         style = style.copyWith(color: Colors.purpleAccent);
-        break;
-      case "pink":
-        style = style.copyWith(color: Colors.pink);
         break;
       case "red":
         style = style.copyWith(color: Colors.red);

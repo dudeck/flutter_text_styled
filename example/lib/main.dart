@@ -2,28 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_text_styled/flutter_text_styled.dart';
 
 void main() {
-  runApp(StyledPage());
+  runApp(const StyledPage());
 }
 
 class StyledPage extends StatefulWidget {
+  const StyledPage({super.key});
+
   @override
-  _StyledPageState createState() => _StyledPageState();
+  StyledPageState createState() => StyledPageState();
 }
 
-class _StyledPageState extends State<StyledPage> {
+class StyledPageState extends State<StyledPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Text Style Demo',
       home: Scaffold(
         appBar: AppBar(
-          title: Text("Title"),
+          title: const Text("Title"),
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: SingleChildScrollView(
             child: TextStyled(
-              textStyle: TextStyle(
+              textStyle: const TextStyle(
                 fontSize: 30,
                 color: Colors.grey,
               ),

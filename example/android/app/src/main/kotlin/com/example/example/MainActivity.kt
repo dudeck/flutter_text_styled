@@ -1,4 +1,4 @@
-package pl.dudeck.flutter_text_styled2_example
+package com.example.example
 
 import io.flutter.embedding.android.FlutterActivity
 
