@@ -16,6 +16,7 @@ RegExp _closeTagRegExp = RegExp(r'\[/[b|i|u]\]|(\[/color\])|(\[/a\])');
 
 class TextStyled {
   final TextStyle textStyle;
+  final TextStyle? linkStyle;
   final TextAlign textAlign;
   final int? maxLines;
   final bool softWrap;
@@ -48,6 +49,7 @@ class TextStyled {
 
   TextStyled({
     this.textStyle = const TextStyle(),
+    this.linkStyle,
     this.textAlign = TextAlign.start,
     this.softWrap = true,
     this.overflow = TextOverflow.clip,
@@ -250,8 +252,11 @@ class TextStyled {
           style = _getColorStyle(value, style);
           break;
         case TAGS.link:
-          style = style.copyWith(
-              decoration: TextDecoration.underline, color: Colors.blue);
+          style = linkStyle ??
+              style.copyWith(
+                decoration: TextDecoration.underline,
+                color: Colors.blue,
+              );
           link = value;
           break;
       }
